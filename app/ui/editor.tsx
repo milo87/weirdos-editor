@@ -2,8 +2,9 @@
 
 import ModelCard from '@/app/ui/model-card'
 import { ModelData } from '@/app/lib/model'
-import { generateName, generateId } from '@/app/lib/utils'
+import { createDefaultModel } from '@/app/lib/utils'
 import { useContext, createContext, useState } from 'react';
+
 
 
 const ModelControlsContext = createContext<[() => void, (id: string) => void]>([
@@ -20,7 +21,7 @@ function AddModel() {
     return (
         <button
             className='flex items-center justify-center rounded bg-white p-4 text-xl text-stone-800'
-            onClick={() => add()}>
+            onClick={() => add()} >
             Add Model
         </button>
     )
@@ -36,28 +37,23 @@ function Controls() {
 
 export default function Editor() {
     let initialModels: Map<string, ModelData> = new Map<string, ModelData>([
-        ["00000000", {
-            name: "Leader",
-            id: "leader",
-            isLeader: true
-        }]
+        ["leader", createDefaultModel(true)]
     ])
 
     const [models, setModel] = useState<Map<string, ModelData>>(initialModels);
 
     const addModel = () => {
-        const name = generateName();
-        const id = generateId();
         setModel((oldModels) => {
-            var newModels = new Map(oldModels)
-            newModels.set(id, { name: name, id: id, isLeader: false })
+            let newModels = new Map(oldModels)
+            let newModel = createDefaultModel()
+            newModels.set(newModel.id, newModel)
             return newModels
         })
     }
 
     const removeModel = (id: string) => {
         setModel((oldModels) => {
-            if (oldModels.get(id)?.isLeader) {
+            if ((oldModels.get(id))?.isLeader) {
                 return oldModels
             }
 
@@ -74,11 +70,11 @@ export default function Editor() {
     })
 
     return (
-        <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
+        <div className="z-10 w-full items-center justify-between font-mono text-sm lg:flex">
             <ModelControlsContext.Provider
                 value={[addModel, removeModel]}>
-                <div className='flex flex-row gap-12'>
-                    <div className='grid auto-rows-auto grid-cols-3 gap-10'>
+                <div className='flex flex-col gap-12 md:flex-row'>
+                    <div className='flex flex-wrap justify-center'>
                         {
                             modelArray.map((modelData) => {
                                 return <ModelCard key={modelData.id} data={modelData} removeButtonFunc={removeModel} />
