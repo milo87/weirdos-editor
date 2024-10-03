@@ -1,19 +1,19 @@
 export type Attribute = {
-    level: string | number
+    level: string
     cost: number
 }
 
 export const SpeedValues: Attribute[] = [
     {
-        level: 1,
+        level: "1",
         cost: 0
     },
     {
-        level: 2,
+        level: "2",
         cost: 1
     },
     {
-        level: 3,
+        level: "3",
         cost: 2
     }
 ]
@@ -75,5 +75,28 @@ export const WillpowerValues: Attribute[] = [
     {
         level: "2d10",
         cost: 6
+    }
+]
+
+export const attributeMappings = [
+    {
+        name: "speed",
+        attributes: SpeedValues
+    },
+    {
+        name: "defense",
+        attributes: DefenseValues
+    },
+    {
+        name: "firepower",
+        attributes: FirepowerValues
+    },
+    {
+        name: "prowess",
+        attributes: ProwessValues
+    },
+    {
+        name: "willpower",
+        attributes: WillpowerValues
     }
 ]
