@@ -4,9 +4,9 @@ import { NextUIProvider } from '@nextui-org/react';
 export default function Home() {
   return (
     <NextUIProvider>
-      <main className="flex min-h-screen flex-col items-center justify-between p-24 dark text-foreground bg-background">
+      <div className="lg:flex dark text-foreground bg-background min-h-screen pb-1 lg:p-10 xl:p-20">
         <Editor />
-      </main>
+      </div>
     </NextUIProvider>
   );
 }

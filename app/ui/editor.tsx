@@ -7,6 +7,7 @@ import { useContext, createContext, useState, useMemo } from 'react';
 import { FaRegSave, FaChessPawn, FaFolderOpen } from "react-icons/fa";
 import { Warband } from '../lib/warband';
 import { Trait, WarbandTraits } from '../lib/traits';
+import { Button } from '@nextui-org/react';
 
 export type ModelControlsContextType = {
     "addModel": () => void
@@ -33,43 +34,55 @@ export function useModelControlsContext() {
 }
 
 function AddModel() {
-    const { addModel: add } = useModelControlsContext();
+    const { addModel } = useModelControlsContext();
     return (
-        <button
-            className='flex items-center justify-center rounded bg-white p-4 text-xl text-stone-800'
-            onClick={() => add()} >
-            <FaChessPawn className='mr-2' /> Add Model
-        </button>
+        <Button
+            className='grow'
+            onClick={addModel}
+            startContent={<FaChessPawn />}
+        >
+            Add Model
+        </Button>
     )
 }
 
 function Save() {
-    const { dumpWarband: dump } = useModelControlsContext();
+    const { dumpWarband } = useModelControlsContext();
     return (
-        <button
-            className='flex items-center justify-center rounded bg-white p-4 text-xl text-stone-800' onClick={dump}>
-            <FaRegSave className='mr-2' /> Save
-        </button>
+        <Button
+            className='grow'
+            onClick={dumpWarband}
+            startContent={<FaRegSave />}>
+            Save
+        </Button>
     )
 }
 
 function Load() {
-    const { loadWarband: load } = useModelControlsContext();
+    const { loadWarband } = useModelControlsContext();
     return (
-        <button
-            className='flex items-center justify-center rounded bg-white p-4 text-xl text-stone-800' onClick={load}>
-            <FaFolderOpen className='mr-2' /> Load
-        </button>
+        <Button
+            className='grow'
+            onClick={loadWarband}
+            startContent={<FaFolderOpen />}>
+            Load
+        </Button>
     )
 }
 
-function Controls() {
+function Controls({ totalPoints }: { totalPoints: number }) {
     return (
-        <div className='flex flex-col gap-8'>
-            <AddModel />
-            <Save />
-            <Load />
-        </div>
+        <nav className="flex z-50 top-0 lg:top-10 sticky flex-col items-center w-full lg:max-w-44 p-4 bg-stone-800 rounded-b-md md:rounded-md shadow-zinc-950 shadow-lg
+        ">
+            <div className='flex gap-2 flex-wrap justify-center'>
+                <AddModel />
+                <Save />
+                <Load />
+            </div>
+            <div className="flex flex-col flex-wrap">
+                <p className="flex-auto text-wrap text-center mt-4">Warband points: {totalPoints}</p>
+            </div>
+        </nav>
     )
 }
 
@@ -139,7 +152,7 @@ export default function Editor() {
         }
     }
 
-    const [modelArray, modelPoints] = useMemo(() => {
+    const [modelArray, totalPoints] = useMemo(() => {
         let arr: ModelData[] = []
         let points = 0
         warbandData.models?.forEach((value: ModelData, _key: string) => {
@@ -148,25 +161,22 @@ export default function Editor() {
         })
 
         return [arr, points];
-    }, [warbandData.models])
+    }, [warbandData])
+
+    const contextValue = { addModel, removeModel, updateModel, updateWarbandTrait, updateLeaderTrait, dumpWarband, loadWarband };
 
     return (
-        <div className="z-10 w-full items-center justify-between font-mono text-sm lg:flex">
-            <div className='flex flex-col'>
-                <ModelControlsContext.Provider value={{ addModel, removeModel, updateModel, updateWarbandTrait, updateLeaderTrait, dumpWarband, loadWarband }}>
-                    <div className='flex flex-col gap-12 md:flex-row'>
-                        <div className='flex flex-wrap justify-center'>
-                            {
-                                modelArray.map((modelData) => {
-                                    return <ModelCard key={modelData.id} data={modelData} warbandData={warbandData} />
-                                })
-                            }
-                        </div>
-                        <Controls />
-                    </div>
-                </ModelControlsContext.Provider>
-                <p className='flex flex-auto justify-center'>Total points: {modelPoints}</p>
-            </div >
-        </div >
+        <ModelControlsContext.Provider value={contextValue}>
+            <div id="main-ui" className='lg:flex flex-row items-baseline gap-12 h-auto'>
+                <Controls totalPoints={totalPoints} />
+                <main className='flex-wrap'>
+                    {
+                        modelArray.map((modelData) => {
+                            return <ModelCard key={modelData.id} data={modelData} warbandData={warbandData} />
+                        })
+                    }
+                </main>
+            </div>
+        </ModelControlsContext.Provider>
     )
 }

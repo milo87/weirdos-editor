@@ -8,20 +8,26 @@ export enum TraitTarget {
 }
 
 type TraitEffect = {
-    targets: string[]
-    pointsAdjustment: number
-    targetType: TraitTarget
+    readonly targets: string[]
+    readonly pointsAdjustment: number
+    readonly targetType: TraitTarget
 }
 
 export type Trait = {
-    id: string
-    name: string
-    cost: number
-    description: string
-    effects?: TraitEffect[]
+    readonly id: string
+    readonly name: string
+    readonly cost: number
+    readonly description: string
+    readonly effects?: TraitEffect[]
 }
 
 export const LeaderTraits: Trait[] = [
+    {
+        id: "none",
+        name: "None",
+        cost: 0,
+        description: "-"
+    },
     {
         id: "bounty-hunter",
         name: "Bounty Hunter",
@@ -64,9 +70,15 @@ export const LeaderTraits: Trait[] = [
         cost: 0,
         description: "+1DT to Initiative rolls"
     }
-]
+] as const;
 
 export const WarbandTraits: Trait[] = [
+    {
+        id: "none",
+        name: "None",
+        cost: 0,
+        description: "-"
+    },
     {
         id: "cyborgs",
         name: "Cyborgs",
@@ -135,4 +147,4 @@ export const WarbandTraits: Trait[] = [
         cost: 0,
         description: "A second staggered condition does not take models in this Warband out of action"
     }
-]
+] as const;

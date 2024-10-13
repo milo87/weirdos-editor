@@ -2,6 +2,7 @@ import { randomBytes } from "crypto";
 import { ModelData } from "./model";
 import { SpeedValues, DefenseValues, ProwessValues, FirepowerValues, WillpowerValues } from "./attributes";
 import { CloseCombatWeapons, RangedWeapons } from "./weapons";
+import { Equipment } from "./equipment";
 import { Warband } from "./warband";
 import { TraitTarget } from "./traits";
 
@@ -59,14 +60,65 @@ export function calculateModelPoints(model: ModelData, warband: Warband): number
         total += cost;
     }
 
-    model.closeCombatWeapon && (total += model.closeCombatWeapon?.points);
-    model.rangedWeapon && model.attributes.firepower.level !== "None" && (total += model.rangedWeapon?.points);
+    // Calculate points for all equipment
+    let maxEquipmentSlots = model.maxEquipmentSlots;
+    if (warband.warbandTrait && warband.warbandTrait.id === "cyborgs") {
+        maxEquipmentSlots += 1;
+    }
+
+    for (const i of model.equipment.slice(0, maxEquipmentSlots)) {
+        let cost = i.points;
+        // Some traits make equipment cheaper
+        warband.warbandTrait?.effects?.filter((trait) => trait.targetType === TraitTarget.Equipment)
+            ?.map((trait) => {
+                for (const target of trait.targets) {
+                    if (target === i.id) {
+                        if (trait.pointsAdjustment === 0) cost = trait.pointsAdjustment;
+                        else Math.max(0, cost += trait.pointsAdjustment);
+                    }
+                }
+            })
+        total += cost;
+    }
+
+    if (model.closeCombatWeapon) {
+        let w = model.closeCombatWeapon;
+        let cost = w.points;
+        warband.warbandTrait?.effects?.filter((trait) => trait.targetType === TraitTarget.CloseCombatWeapon)
+            ?.map((trait) => {
+                for (const target of trait.targets) {
+                    if (target === w.id) {
+                        if (trait.pointsAdjustment === 0) cost = trait.pointsAdjustment;
+                        else cost += trait.pointsAdjustment;
+                    }
+                }
+            })
+        total += Math.max(0, cost);
+    }
+
+    if (model.rangedWeapon) {
+        let w = model.rangedWeapon;
+        let cost = w.points;
+        warband.warbandTrait?.effects?.filter((trait) => trait.targetType === TraitTarget.RangedWeapon)
+            ?.map((trait) => {
+                for (const target of trait.targets) {
+                    if (target === w.id) {
+                        if (trait.pointsAdjustment === 0) cost = trait.pointsAdjustment;
+                        else cost += trait.pointsAdjustment;
+
+                    }
+                }
+            })
+        total += Math.max(0, cost);
+    }
+
+    model.powers?.map((p) => total += p.cost);
 
     return total
 }
 
 export function createDefaultModel(isLeader: boolean = false): ModelData {
-    return new ModelData({
+    return {
         isLeader: isLeader,
         id: isLeader ? "leader" : generateId(),
         name: isLeader ? "Leader" : generateName(),
@@ -78,8 +130,10 @@ export function createDefaultModel(isLeader: boolean = false): ModelData {
             firepower: { ...isLeader ? FirepowerValues[1] : FirepowerValues[0] },
         },
         rangedWeapon: { ...RangedWeapons[0] },
-        closeCombatWeapon: { ...CloseCombatWeapons[0] }
-    })
+        closeCombatWeapon: { ...CloseCombatWeapons[0] },
+        maxEquipmentSlots: isLeader ? 2 : 1,
+        equipment: new Array(3).fill({ ...Equipment[0] }),
+    }
 }
 
 export function modelDataReplacer(_key: string, value: Map<string, any>) {

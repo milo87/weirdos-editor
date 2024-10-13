@@ -3,7 +3,7 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-o
 import { Button } from "@nextui-org/react";
 import { Attribute, attributeMappings } from "../lib/attributes";
 import { useMemo, useState } from "react";
-import { MdOutlineArrowDropDown } from "react-icons/md";
+import { MdOutlineArrowDropDown, MdOutlineArrowDropUp } from "react-icons/md";
 import { useModelControlsContext } from "./editor";
 
 
@@ -24,15 +24,15 @@ export function AttributeCell({ name, choices, data }: { name: string, choices: 
     const context = useModelControlsContext();
 
     return (
-        <div className="flex flex-col border-solid border-2 border-gray-900">
-            <p className="flex p-2 bg-gray-900 text-gray-50">{name}</p>
+        <div className="flex flex-col md:min-w-32 p-2 grow md:grow-0">
+            <p className="flex p-2 justify-center">{name}</p>
             <Dropdown
                 className="dark"
                 onOpenChange={setIsOpen}
             >
                 <DropdownTrigger>
                     <Button className="flex flex-row justify-between pr-2">
-                        <span>{selectedAttribute}</span><span>{isOpen ? "" : <MdOutlineArrowDropDown />}</span>
+                        <span>{selectedAttribute}</span><span>{isOpen ? <MdOutlineArrowDropUp /> : <MdOutlineArrowDropDown />}</span>
                     </Button>
                 </DropdownTrigger>
                 <DropdownMenu
@@ -45,7 +45,7 @@ export function AttributeCell({ name, choices, data }: { name: string, choices: 
                     onSelectionChange={(keys) => {
                         const keyParts = keys.currentKey?.split("-");
                         const level = keyParts && keyParts[2];
-                        const newModelData = new ModelData(data);
+                        const newModelData = { ...data };
                         const newAttr = attributeMappings
                             .find((a) => a.name === name)?.attributes
                             .find((a) => a.level === level);
@@ -71,7 +71,7 @@ export function AttributeCell({ name, choices, data }: { name: string, choices: 
 
 export function AttributeCells({ data }: { data: ModelData }) {
     return (
-        <div className="flex flex-row">
+        <div className="flex md:flex-col flex-row flex-wrap bg-stone-900 rounded-md max-h-fit">
             {attributeMappings.map(({ name, attributes }) => {
                 return <AttributeCell key={`${data.id}-${name}`} name={name} data={data} choices={attributes} />
             })}

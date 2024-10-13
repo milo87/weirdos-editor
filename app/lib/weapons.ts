@@ -1,9 +1,9 @@
 export type Weapon = {
-    id: string,
-    name: string,
-    actions: number,
-    notes: string,
-    points: number
+    readonly id: string,
+    readonly name: string,
+    readonly actions: number,
+    readonly notes: string,
+    readonly points: number
 }
 
 export const RangedWeapons: Weapon[] = [
@@ -84,7 +84,7 @@ export const RangedWeapons: Weapon[] = [
         notes: "Reroll FP rolls of 1 or 2",
         points: 3
     }
-]
+] as const;
 
 export const CloseCombatWeapons: Weapon[] = [
     {
@@ -143,4 +143,4 @@ export const CloseCombatWeapons: Weapon[] = [
         notes: "Can target enemies up to 1 stick away",
         points: 2
     }
-]
+] as const;

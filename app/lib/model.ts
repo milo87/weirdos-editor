@@ -1,19 +1,10 @@
 import { Attribute } from './attributes'
+import { Item } from './equipment'
+import { PsychicPower } from './powers'
 import { Trait } from './traits'
 import { Weapon } from './weapons'
 
-export class ModelData {
-    constructor(data: ModelData) {
-        this.id = data.id
-        this.name = data.name
-        this.isLeader = data.isLeader
-        this.attributes = data.attributes
-        this.leaderTrait = data.leaderTrait
-        this.warbandTrait = data.warbandTrait
-        this.rangedWeapon = data.rangedWeapon
-        this.closeCombatWeapon = data.closeCombatWeapon
-    }
-
+export type ModelData = {
     id: string
     name: string
     isLeader: boolean
@@ -25,6 +16,11 @@ export class ModelData {
         prowess: Attribute
         willpower: Attribute
     }
+
+    powers?: PsychicPower[]
+
+    equipment: Item[]
+    maxEquipmentSlots: number
 
     leaderTrait?: Trait
     warbandTrait?: Trait
